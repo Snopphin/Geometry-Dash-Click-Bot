@@ -1,4 +1,4 @@
-# Geometry-Dash-Click-Bot
+# Geometry-Dash-Click-Bot (cbot)
 #warning go to release its better version
 
 
