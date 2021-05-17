@@ -1,5 +1,5 @@
 # Geometry-Dash-Click-Bot (cbot)
-#warning go to release its better version
+#now its on mega.nz
 
 
 Click Bot in Game
