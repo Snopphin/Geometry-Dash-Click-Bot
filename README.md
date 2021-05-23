@@ -1,5 +1,5 @@
 # Geometry-Dash-Click-Bot (cbot)
-#now its on mega.nz
+#go to releases
 
 Soon?
 ![image](https://user-images.githubusercontent.com/81505000/119257930-331c0c80-bbd0-11eb-96bb-0d4246167fd4.png)
