@@ -1,8 +1,7 @@
 # Geometry-Dash-Click-Bot (cbot)
-#go to releases
 
-Soon?
-![image](https://user-images.githubusercontent.com/81505000/119257930-331c0c80-bbd0-11eb-96bb-0d4246167fd4.png)
+![image](https://user-images.githubusercontent.com/81505000/119852097-a945a980-bf17-11eb-8b67-226529173195.png)
+
 
 
 Click Bot in Game
