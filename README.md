@@ -4,6 +4,7 @@
 
 
 
-Click Bot in Game
-How to Enable move Clicks folder to gd folder Then Inject The dll you can use Adafcaefc injector https://github.com/adafcaefc/GDDLLLoader
-Run Geometry Dash Then Go to Settings Enable Click Bot Then Works
+CBot in game.
+Tutorial: https://www.youtube.com/watch?v=Qp_3cLW1GUQ
+GDDlloader https://github.com/adafcaefc/GDDLLLoader/releases/tag/v1
+
