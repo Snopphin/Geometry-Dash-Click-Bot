@@ -45,7 +45,7 @@
 #include <GameManager3.h>
 #include <MenuOptions.h>
 #include <menu_nodes/CCMenu.h>
-//48 includes :troll:
+//47 includes :troll:
 using namespace cocos2d;
 
 
@@ -129,9 +129,10 @@ long __fastcall RenderMain()
         GetWindowThreadProcessId(hWnd, &proccess_ID);
         HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, proccess_ID);
     }
-    ImGui::GetStyle().FrameRounding = 4.0f;
+    ImGui::GetStyle().FrameRounding = 4.0f; 
     ImGui::GetStyle().GrabRounding = 4.0f;
     ImVec4* colors = ImGui::GetStyle().Colors;
+	//colors
     colors[ImGuiCol_Text] = ImVec4(0.95f, 0.96f, 0.98f, 1.00f);
     colors[ImGuiCol_TextDisabled] = ImVec4(0.36f, 0.42f, 0.47f, 1.00f);
     colors[ImGuiCol_WindowBg] = ImVec4(0.11f, 0.15f, 0.17f, 1.00f);
@@ -202,7 +203,7 @@ long __fastcall RenderMain()
         ImGui::Begin("Mods");
         ImGui::SetWindowSize(ImVec2(182, 215));
 
-        if (ImGui::Checkbox("Enable Rainbow Icon", &lmao2))
+        if (ImGui::Checkbox("Enable Rainbow Icon", &lmao2)) //unfinished
         {
 
             auto gm = gd::GameManager::sharedState();
@@ -852,12 +853,12 @@ long __fastcall RenderMain()
         if (ImGui::InputFloat("Speed", &sliderlol, 0.1, 1.0))
 
         {
-            Speedhack::Setup();
+            Speedhack::Setup(); //absolute
             Speedhack::SetSpeed(sliderlol);
             return 0;
         }
         ImGui::End();
-        ImGui::Begin("CBot 1.1");
+        ImGui::Begin("CBot 1.1"); //title
         ImGui::SetWindowSize(ImVec2(180, 180));
         ImGui::SetWindowPos(
             ImVec2(90, ImGui::GetWindowHeight()),
@@ -865,7 +866,7 @@ long __fastcall RenderMain()
         static bool disabled = false;
         static bool CBoot = false;
         static bool bot = false;
-        if (ImGui::Checkbox("Enable CBot", &CBoot))
+        if (ImGui::Checkbox("Enable CBot", &CBoot)) //checkbox
         {
 
             HWND hWnd = FindWindow(0, "Geometry Dash");
@@ -887,11 +888,11 @@ long __fastcall RenderMain()
                 {
                     MH_Initialize();
 
-                    // Hooking
+                    // Hook
                     PlayLayer::mem_init();
                     PlayerObject::mem_init();
 
-                    // Enable all hooks
+                    // Enable cbot
                     MH_EnableHook(MH_ALL_HOOKS);
                 }
             }
@@ -918,13 +919,13 @@ long __fastcall RenderMain()
                 if (music)
                 {
                     music->stop();
-                    music->drop(); // release music stream.
+                    music->drop(); //
                 }
             }
         }
         static int sliderInt2 = 0.f;
         if (ImGui::SliderInt)
-        if (ImGui::Button("Inject Dll")) {
+        if (ImGui::Button("Inject Dll")) { //not my func
             std::string stringpath = chooseDLL();
             const char* DllPath = stringpath.c_str();
 
@@ -970,7 +971,7 @@ long __fastcall RenderMain()
         }
 
     
-                ImGui::Text(" %.3f ms (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+                ImGui::Text(" %.3f ms (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate); //some test
                 ImGui::End();
             
         
@@ -982,7 +983,7 @@ long __fastcall RenderMain()
 
 inline unsigned int(__thiscall* resetLevel)(void* self);
 inline unsigned int(__thiscall* holds)(void* self, void* PlayerButton);
-inline unsigned int(__thiscall* OnExit)(void* self);
+inline unsigned int(__thiscall* OnExit)(void* self); //idk why 
 int i;
 using namespace irrklang;
 #include <iomanip>
