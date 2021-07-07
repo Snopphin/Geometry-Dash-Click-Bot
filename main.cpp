@@ -45,10 +45,11 @@
 #include <GameManager3.h>
 #include <MenuOptions.h>
 #include <menu_nodes/CCMenu.h>
+//48 includes :troll:
 using namespace cocos2d;
 
 
-std::string chooseDLL()
+std::string chooseDLL() //choose path
 {
     OPENFILENAME ofn;
     char fileName[MAX_PATH] = "";
@@ -73,7 +74,7 @@ DWORD __declspec(dllexport) WINAPI Hooking(void* hModule) {
     return 0;
 }
 
-void WriteBytes(void* location, std::vector<BYTE> bytes) { //thx to fig
+void WriteBytes(void* location, std::vector<BYTE> bytes) { //figment
     DWORD old_prot;
     VirtualProtect(location, bytes.size(), PAGE_EXECUTE_READWRITE, &old_prot);
 
@@ -83,10 +84,6 @@ void WriteBytes(void* location, std::vector<BYTE> bytes) { //thx to fig
 }
 
 
-bool __fastcall PlayLayer::initHook(CCLayer* self, int edx, void* GJGameLevel) {
-    bool ret = PlayLayer::init(self, GJGameLevel);
-    return ret;
-}
 
 static HWND window = NULL;
 
