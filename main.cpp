@@ -111,8 +111,6 @@ void __fastcall PlayLayer2::hkUpdate4(cocos2d::CCLayer* self, void* edx, float d
     size_t base = (size_t)GetModuleHandle(0);
 
     {
-        CCLabelBMFont* textObj2 = (CCLabelBMFont*)self->getChildByTag(100000);
-        textObj2->removeChildByTag(100000);
     }
 }
 static bool nowave2 = false;
