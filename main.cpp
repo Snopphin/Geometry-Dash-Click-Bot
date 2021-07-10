@@ -45,7 +45,7 @@
 #include <GameManager3.h>
 #include <MenuOptions.h>
 #include <menu_nodes/CCMenu.h>
-//47 includes :troll:
+
 using namespace cocos2d;
 
 
