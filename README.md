@@ -6,5 +6,5 @@
 
 CBot in game.
 Tutorial: https://www.youtube.com/watch?v=Qp_3cLW1GUQ
-GDDlloader https://github.com/adafcaefc/GDDLLLoader/releases/tag/v1
+GDDlloader https://github.com/adafcaefc/GDDLLLoader/releases/tag/v2
 
