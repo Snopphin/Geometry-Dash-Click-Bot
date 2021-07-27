@@ -22,7 +22,6 @@
 #include <stdio.h>      
 #include <stdlib.h>     
 #include <random>
-#include "sha1.h"
 #include <irrKlang.h>
 #include <ik_irrKlangTypes.h>
 #include <ik_ISound.h>
@@ -34,10 +33,11 @@
 #include <PlayLayer2.h>
 #include <GameManager2.h>
 #include <PlayLayer3.h>
-#include <GameManager3.h>
-#include <MenuOptions.h>
+#include <Soft.h>
+#include <fmod.h>
+#include <fmod.hpp>
 using namespace cocos2d;
-
+using namespace irrklang;
 typedef void* (__cdecl* fSharedApplication)();
 typedef void(__thiscall* fSetAnimationInterval)(void* instance, double delay);
 fSharedApplication sharedApplication;
@@ -60,7 +60,55 @@ void Fps(int FPS)
 
    
 }
+namespace SpeedhackAudio {
+    void* channel;
+    float speed;
+    bool initialized = false;
 
+    // setfrequency
+    // setvolume
+
+    void* (__stdcall* setVolume)(void* t_channel, float volume);
+    void* (__stdcall* setFrequency)(void* t_channel, float frequency);
+
+    void* __stdcall AhsjkabdjhadbjJHDSJ(void* t_channel, float volume) {
+        channel = t_channel;
+
+        if (speed != 1.f) {
+            setFrequency(channel, speed);
+
+        }
+        return setVolume(channel, volume);
+    }
+
+    void init() {
+        if (initialized)
+            return;
+
+        setFrequency = (decltype(setFrequency))GetProcAddress(GetModuleHandle("fmod.dll"), "?setPitch@ChannelControl@FMOD@@QAG?AW4FMOD_RESULT@@M@Z");
+        DWORD hkAddr = (DWORD)GetProcAddress(GetModuleHandle("fmod.dll"), "?setVolume@ChannelControl@FMOD@@QAG?AW4FMOD_RESULT@@M@Z");
+
+        MH_CreateHook(
+            (PVOID)hkAddr,
+            AhsjkabdjhadbjJHDSJ,
+            (PVOID*)&setVolume
+        );
+
+        speed = 1.f;
+        initialized = true;
+    }
+
+    void set(float frequency) {
+        if (!initialized)
+            init();
+
+        if (channel == nullptr)
+            return;
+
+        speed = frequency;
+        setFrequency(channel, frequency);
+    }
+}
 std::string chooseDLL()
 {
     OPENFILENAME ofn;
@@ -102,17 +150,16 @@ bool show = false;
 
 
 static bool nowave2 = false;
-#include "sha1.h" //mhv5
 #include <sstream>
 #include <iomanip>
 #include <fstream>
 #include <algorithm>
 #include <windows.h>
-#include <handler.cpp>
 #include <io.h>
 static int num = 4;
 static int snum = 4;
 #include <fstream>
+#include <GameManager3.h>
 std::string Folder()
 {
     OPENFILENAME ofn;
@@ -159,12 +206,17 @@ static bool cbotbutdis = false;
 static bool lol2 = false;
 static bool fpsgay = false;
 static bool why = false;
+static float setv = 1.0f;
+static float setv2 = 1.0f;
+static int sclick = 0;
+static float i3 = 0.1;
+static float i2 = 0.1;
+static int srelease = 0;
+static bool hard = false;
+static bool console = false;
 long __fastcall RenderMain()
 {
 
-
-    HWND g = FindWindow(0, "Geometry Dash");
-    HWND d = SetActiveWindow(g);
 
     HWND hWnd = FindWindow(0, "Geometry Dash");
     {
@@ -176,6 +228,8 @@ long __fastcall RenderMain()
     ImGui::GetStyle().GrabRounding = 4.0f;
 
     ImVec4* colors = ImGui::GetStyle().Colors;
+
+
     colors[ImGuiCol_Text] = ImVec4(0.95f, 0.96f, 0.98f, 1.00f);
     colors[ImGuiCol_TextDisabled] = ImVec4(0.36f, 0.42f, 0.47f, 1.00f);
     colors[ImGuiCol_WindowBg] = ImVec4(0.11f, 0.15f, 0.17f, 1.00f);
@@ -226,6 +280,7 @@ long __fastcall RenderMain()
     colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.35f);
     if (GetAsyncKeyState(VK_TAB) & 1) {
         show = !show;
+        
     }
     if (show) {
         static bool checked = false;
@@ -246,9 +301,18 @@ long __fastcall RenderMain()
         static bool fun = false;
         static bool fun2 = false;
         static bool fpsm = false;
-
+        static int wave = 1;
         ImGui::Begin("Mods");
         ImGui::SetWindowSize(ImVec2(182, 215));
+
+        if (ImGui::InputFloat("Float", &i2))
+        {
+
+        }
+        if (ImGui::InputInt("Int", &sclick))
+        {
+
+        }
         if (ImGui::InputFloat("Fps Physhic", &g_target_fps, 60.f, 5000.f))
         {
 
@@ -281,7 +345,7 @@ long __fastcall RenderMain()
             auto player1 = play_layer->m_player1;
             if (play_layer)
             {
-                player1->setOpacity({ 80 });
+
             }
         }
         if (ImGui::Checkbox("Enable Fps Counter", &fps22))
@@ -962,11 +1026,12 @@ long __fastcall RenderMain()
             }
         }        
         static float sliderlol = 1.f;
-        if (ImGui::InputFloat("Speed", &sliderlol, 0.1, 1.0))
+        if (ImGui::InputFloat("Speed", &sliderlol, 0.1f, 1.0f))
         {
 
             Speedhack::Setup();
             Speedhack::SetSpeed(sliderlol);
+            SpeedhackAudio::set(sliderlol);
         }
         static int sliderlol2 = 60;
         if (ImGui::InputInt("Fps Bypass", &sliderlol2, 0, 10000, 0))
@@ -1007,7 +1072,7 @@ long __fastcall RenderMain()
                         // Hooking
                         PlayLayer::mem_init();
                         PlayerObject::mem_init();
-
+                        Soft::mem_init();
                         // Enable all hooks
                         MH_EnableHook(MH_ALL_HOOKS);
 
@@ -1029,11 +1094,10 @@ long __fastcall RenderMain()
         {
 
         }
-        if (ImGui::Button("Choose Folder"))
+        if (ImGui::InputFloat("Set Volume of clicks", &setv, 0.1, 9.0))
         {
-            Folder();
-        }
 
+        }
         using namespace irrklang;
         static bool lolgay2 = false;
         if (ImGui::Checkbox("Enable Pc Noise", &lol2))
@@ -1056,6 +1120,18 @@ long __fastcall RenderMain()
             {
                 lolgay2 = false;
                 
+            }
+            return 0;
+        }
+        if (ImGui::Checkbox("Enable Console", &console))
+        {
+            console = true;
+            if (console == false)
+            {
+                FreeConsole();
+
+                console = false;
+ 
             }
             return 0;
         }
@@ -1188,8 +1264,9 @@ void __fastcall PlayLayer3::hkUpdate2(cocos2d::CCLayer* self, void* edx, float d
         if (x != prevX2) {
             frames2 += 1;
             totalDelta2 += delta;
-        }
 
+
+        }
 
 
         size_t base = (size_t)GetModuleHandle(0);
@@ -1206,8 +1283,10 @@ void __fastcall PlayLayer3::hkUpdate2(cocos2d::CCLayer* self, void* edx, float d
 
         if (wouldDie2) {
             wouldDie2 = false;
-            if (totalDelta2 >= 0.1 && x != prevX2) {
+            if (totalDelta2 >= 1 && x != prevX2) {
+
                 deaths2 += 1;
+                
             }
         }
 
@@ -1264,72 +1343,323 @@ void PlayLayer3::mem_init() {
 const int MAX_SIZE = 26;
 
 
+static float j2 = 0.0;
+static int is = 0;
+void __fastcall Soft::hkSoft(cocos2d::CCLayer* self, void* edx, float delta)
+{
+    auto gm = gd::GameManager::sharedState();
+    auto play_layer = gm->getPlayLayer();
+
+
+    if (play_layer)
+    {
+        is += 1;
+        if (is == 1)
+        {
+            FMOD_RESULT result;
+
+
+            FMOD::System* system = nullptr;
+
+            result = FMOD::System_Create(&system);
+
+            result = system->init(512, FMOD_INIT_NORMAL, nullptr);
+            FMOD::ChannelGroup* channelGroup = nullptr;
+
+            result = system->createChannelGroup("for fuck sake", &channelGroup);
+        }
+            if (cbotbutdis == true)
+            {
+                i2 += 0.0273;
+                i3 += 0.0273;
+
+                if (sclick < 0)
+                {
+                    sclick += 1;
+
+                }
+                if (sclick > 3)
+                {
+                    sclick -= 1;
+                }
+                if (i2 > 1)
+                {
+                    sclick -= 0.001;
+                    i2 = 0;
+                    sclick += 0.0005;
+                }
+
+
+
+                if (srelease < 0)
+                {
+                    srelease += 1;
+
+                }
+                if (srelease > 3)
+                {
+                    srelease -= 1;
+                }
+                if (i3 > 1)
+                {
+                    srelease -= 0.001;
+                    i3 = 0;
+                    srelease += 0.0005;
+                }
+            }
+        
+        
+    }
+    return Soft::SF(self, delta);
+}
+
+void Soft::mem_init() {
+    size_t base = (size_t)GetModuleHandle(0);
+
+    MH_CreateHook(
+        (PVOID)(base + 0x2029C0),
+        Soft::hkSoft,
+        (LPVOID*)&Soft::SF);
+}
+
 
 void holdran()
 {
+ 
+    FMOD_RESULT result;
 
-
+    
+    FMOD::System* system = nullptr;
+    result = FMOD::System_Create(&system);
+    result = system->init(512, FMOD_INIT_NORMAL, nullptr);
+    FMOD::Sound* sound = nullptr;
+    FMOD::Sound* sound2 = nullptr;
+    FMOD::Sound* sound3 = nullptr;
+    FMOD::Channel* channel = nullptr;
+    FMOD::Channel* channel2 = nullptr;
+    FMOD::Channel* channel3 = nullptr;
     auto gm = gd::GameManager::sharedState();
     auto play_layer = gm->getPlayLayer();
-
-    auto player = play_layer->m_player1;
-    auto player1 = player->create();
-
     if (play_layer)
     {
+        sclick += 1;
         unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
         srand(seed);
         int n = 1;
-        auto clicks = std::vector<std::string>{ "Clicks//softClicks//1.wav", "Clicks//softClicks//2.wav", "Clicks//softClicks//3.wav", "Clicks//softClicks//4.wav", "Clicks//clicks//1.wav", "Clicks//clicks//2.wav", "Clicks//clicks//3.wav", "Clicks//clicks//4.wav", "Clicks//clicks//5.wav", "Clicks//clicks//6.wav", "Clicks//clicks//7.wav", "Clicks//clicks//8.wav", "Clicks//clicks//9.wav", "Clicks//clicks//10.wav","Clicks//clicks//11.wav", "Clicks//clicks//12.wav", "Clicks//clicks//13.wav", "Clicks//clicks//14.wav", "Clicks//clicks//15.wav", "Clicks//clicks//16.wav", "Clicks//clicks//17.wav", "Clicks//clicks//18.wav", "Clicks//clicks//19.wav", "Clicks//clicks//20.wav", "Clicks//clicks//21.wav", "Clicks//clicks//22.wav" };
+        
+        auto clicks = std::vector<std::string>{ "Clicks//clicks//1.wav", "Clicks//clicks//2.wav", "Clicks//clicks//3.wav", "Clicks//clicks//4.wav", "Clicks//clicks//5.wav", "Clicks//clicks//6.wav", "Clicks//clicks//7.wav", "Clicks//clicks//8.wav", "Clicks//clicks//9.wav", "Clicks//clicks//10.wav","Clicks//clicks//11.wav", "Clicks//clicks//12.wav", "Clicks//clicks//13.wav", "Clicks//clicks//14.wav", "Clicks//clicks//15.wav", "Clicks//clicks//16.wav", "Clicks//clicks//17.wav", "Clicks//clicks//18.wav", "Clicks//clicks//19.wav", "Clicks//clicks//20.wav", "Clicks//clicks//21.wav", "Clicks//clicks//22.wav" };
+        auto sclicks = std::vector<std::string>{ "Clicks//softClicks//1.wav", "Clicks//softClicks//2.wav", "Clicks//softClicks//3.wav", "Clicks//softClicks//4.wav", "Clicks//softClicks//5.wav" "Clicks//softClicks//6.wav" "Clicks//softClicks//7.wav" "Clicks//softClicks//8.wav" "Clicks//softClicks//9.wav" "Clicks//softClicks//10.wav" "Clicks//softClicks//11.wav" };
         std::string click = "";
+        std::string ss = "";
         for (int i = 0; i < n; i++)
         {
             click = click + clicks[rand() % num];
+            ss = ss + sclicks[rand() % snum];
         }
-        ISoundEngine* engine = createIrrKlangDevice();
-        ISound* music = engine->play2D(click.c_str(), false, false, false, ESM_AUTO_DETECT, true);
-        ISoundEffectControl* fx = 0;
-        if (music)
+
+        if (sclick == 1)
         {
-            fx = music->getSoundEffectControl();
-            music->setVolume(1.0f);
+            system->createSound(click.c_str(), FMOD_DEFAULT, nullptr, &sound);
+
+            result = system->playSound(sound, nullptr, false, &channel);
+
+
+
+            bool isPlaying1 = false;
+            do {
+
+
+ 
+                system->update();
+            } while (isPlaying1);
         }
+        if (sclick == 2)
+        {
+            system->createSound(click.c_str(), FMOD_DEFAULT, nullptr, &sound2);
+
+   
+            result = system->playSound(sound2, nullptr, false, &channel2);
+
+
+
+
+
+            bool isPlaying2 = false;
+            do {
+
+
+
+                system->update();
+            } while (isPlaying2);
+        }
+        if (sclick > 2)
+        {
+            system->createSound(ss.c_str(), FMOD_DEFAULT, nullptr, &sound3);
+
+            // Play the sound.
+
+            result = system->playSound(sound3, nullptr, false, &channel3);
+
+
+
+
+
+            bool isPlaying3 = false;
+            do {
+
+
+
+                system->update();
+            } while (isPlaying3);
+        }
+       i2 += 0.1;
+       if (i2 > 1)
+       {
+       /* sclick -= 2;
+       i2 = 0;
+       */
+       }
+       if (console == true)
+       {
+           AllocConsole();
+           std::ofstream conout("CONOUT$", std::ios::out);
+           std::ifstream conin("CONIN$", std::ios::in);
+           std::cout.rdbuf(conout.rdbuf());
+           std::cin.rdbuf(conin.rdbuf());
+           if (sclick < 3)
+           {
+               std::cout << click << "" << std::endl;
+           }
+           if (sclick > 2)
+           {
+               std::cout << ss << "" << std::endl;
+           }
+       }
+
 
     }
 }
-
+static int intertget = 0;
 void releaseran()
 {
 
+    FMOD_RESULT result;
+
+    intertget += 1;
+    FMOD::System* system = nullptr;
+
+    result = FMOD::System_Create(&system);
+    if (intertget)
+    result = system->init(512, FMOD_INIT_NORMAL, nullptr);
+
+    
+    FMOD::Sound* sound = nullptr;
+    FMOD::Sound* sound2 = nullptr;
+    FMOD::Sound* sound3 = nullptr;
+    FMOD::Channel* channel = nullptr;
+    FMOD::Channel* channel2 = nullptr;
+    FMOD::Channel* channel3 = nullptr;
     auto gm = gd::GameManager::sharedState();
     auto play_layer = gm->getPlayLayer();
-    auto player = play_layer->m_player1;
     if (play_layer)
     {
-        {
+        ISoundEngine* engine = createIrrKlangDevice();
+        srelease += 1;
         unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
         srand(seed);
         int n = 1;
-        auto clicks = std::vector<std::string>{ "Clicks//softReleases//1.wav", "Clicks//softReleases//2.wav", "Clicks//softReleases//3.wav", "Clicks//softReleases//4.wav", "Clicks//releases//1.wav", "Clicks//releases//2.wav", "Clicks//releases//3.wav", "Clicks//releases//4.wav", "Clicks//releases//5.wav", "Clicks//releases//6.wav", "Clicks//releases//7.wav", "Clicks//releases//8.wav", "Clicks//releases//9.wav", "Clicks//releases//10.wav","Clicks//releases//11.wav", "Clicks//releases//12.wav", "Clicks//releases//13.wav", "Clicks//releases//14.wav", "Clicks//releases//15.wav", "Clicks//releases//16.wav", "Clicks//releases//17.wav", "Clicks//releases//18.wav", "Clicks//releases//19.wav", "Clicks//releases//20.wav" };
+        auto clicks = std::vector<std::string>{  "Clicks//releases//1.wav", "Clicks//releases//2.wav", "Clicks//releases//3.wav", "Clicks//releases//4.wav", "Clicks//releases//5.wav", "Clicks//releases//6.wav", "Clicks//releases//7.wav", "Clicks//releases//8.wav", "Clicks//releases//9.wav", "Clicks//releases//10.wav","Clicks//releases//11.wav", "Clicks//releases//12.wav", "Clicks//releases//13.wav", "Clicks//releases//14.wav", "Clicks//releases//15.wav", "Clicks//releases//16.wav", "Clicks//releases//17.wav", "Clicks//releases//18.wav", "Clicks//releases//19.wav", "Clicks//releases//20.wav" };
+        auto srele = std::vector<std::string>{ "Clicks//softReleases//1.wav", "Clicks//softReleases//2.wav", "Clicks//softReleases//3.wav", "Clicks//softReleases//4.wav", "Clicks//softReleases//5.wav", "Clicks//softReleases/6.wav", "Clicks//softReleases//7.wav", "Clicks//softReleases//8.wav", "Clicks//softReleases//9.wav", "Clicks//softReleases//10.wav", "Clicks//softReleases//11.wav", "Clicks//softReleases//12.wav" };
         std::string click = "";
+        std::string sre = "";
         for (int i = 0; i < n; i++)
         {
         click = click + clicks[rand() % num]; //num 
+        sre = sre + srele[rand() % snum]; //num 
         }
-        ISoundEngine* engine = createIrrKlangDevice();
-        ISound* music = engine->play2D(click.c_str(), false, false, false, ESM_AUTO_DETECT, true);
-        ISoundEffectControl* fx = 0;
-        if (music)
+
+        if (srelease == 1) 
         {
-            fx = music->getSoundEffectControl();
-            music->setVolume(1.2f);
+            system->createSound(click.c_str(), FMOD_DEFAULT, nullptr, &sound);
+
+            result = system->playSound(sound, nullptr, false, &channel);
+
+
+
+            bool isPlaying1 = false;
+            do {
+
+
+
+                system->update();
+            } while (isPlaying1);
         }
+        if (srelease == 2)
+        {
+
+            system->createSound(click.c_str(), FMOD_DEFAULT, nullptr, &sound2);
+
+    
+
+            result = system->playSound(sound2, nullptr, false, &channel2);
+
+
+
+            bool isPlaying2 = false;
+            do {
+
+
+
+                system->update();
+            } while (isPlaying2);
+        }
+        if (srelease > 2)
+        {
+            auto fm = gd::FMODAudioEngine::sharedEngine();
+            fm->preloadEffect(click.c_str());
+            system->createSound(click.c_str(), FMOD_DEFAULT, nullptr, &sound3);
+
+
+
+            result = system->playSound(sound3, nullptr, false, &channel3);
+
+
+
+            bool isPlaying1 = false;
+            do {
+
+
+
+                system->update();
+            } while (isPlaying1);
+
+        }
+        
+        i3 += 0.1;
+        if (i3 > 1)
+        {
+        }
+        if (console == true)
+        {
+            AllocConsole();
+            std::ofstream conout("CONOUT$", std::ios::out);
+            std::ifstream conin("CONIN$", std::ios::in);
+            std::cout.rdbuf(conout.rdbuf());
+            std::cin.rdbuf(conin.rdbuf());
+            if (srelease < 3)
+            {
+                std::cout << click << "" << std::endl;
+            }
+            if (sclick > 2)
+            {
+                std::cout << sre << "" << std::endl;
+            }
         }
     }
 }
 
 bool __fastcall PlayerObject::pushButtonHook(void* self, int edx, void* PlayerButton) {
-    if (cbotbutdis == true)
+    if (cbotbutdis == true && !PlayerButton)
     {
         unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
         srand(seed);
@@ -1339,7 +1669,7 @@ bool __fastcall PlayerObject::pushButtonHook(void* self, int edx, void* PlayerBu
 }
 
 bool __fastcall PlayerObject::releaseButtonHook(void* self, int edx, void* PlayerButton) {
-    if (cbotbutdis == true)
+    if (cbotbutdis == true && !PlayerButton)
     {
         unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
         srand(seed);
@@ -1349,12 +1679,10 @@ bool __fastcall PlayerObject::releaseButtonHook(void* self, int edx, void* Playe
 }
 unsigned int __fastcall resetLevelHook(void* self, int* edx) {
     
-    
-    MH_Initialize();
-    // Hooking
-    PlayerObject::mem_init();
-    // Enable all hooks
-    MH_EnableHook(MH_ALL_HOOKS);
+    sclick = 0;
+    srelease = 0;
+    i3 = 0;
+    i2 = 0;
 
 
     return resetLevel(self);
@@ -1373,10 +1701,9 @@ float PlayLayer2::prevX = 0;
 
 std::string getAccuracyText() {
     if (PlayLayer2::frames == 0) return "Died: 0";
-    int p = (int)(PlayLayer2::frames - PlayLayer2::deaths) / (int)PlayLayer2::frames;
-    
+    int p = (int)(PlayLayer2::deaths);
     std::stringstream stream;
-    stream << "Died: " << std::setprecision(3) << p * 1 << "";
+    stream << "Died: " << std::fixed << std::setprecision(3) << p * 1 << "";
     return stream.str();
 }
 
@@ -1409,6 +1736,7 @@ bool __fastcall PlayLayer2::initHook(CCLayer* self, int edx, void* GJGameLevel) 
     }
     return init(self, GJGameLevel);
 }
+
 void __fastcall PlayLayer2::hkUpdate(cocos2d::CCLayer* self, void* edx, float delta) {
     if (why == true)
     {
@@ -1416,16 +1744,14 @@ void __fastcall PlayLayer2::hkUpdate(cocos2d::CCLayer* self, void* edx, float de
         void* player1 = *(void**)((char*)self + 0x224);
         float x = *(float*)((size_t)player1 + 0x67c);
 
-
-
-
-
-
         if (x != prevX) {
             frames += 1;
             totalDelta += delta;
         }
-
+        if (wouldDie)
+        {
+            deaths += 1;
+        }
         size_t base = (size_t)GetModuleHandle(0);
 
         {
@@ -1466,8 +1792,6 @@ int __fastcall PlayLayer2::hkDeath(void* self, void*, void* go, void* powerrange
     if (base + 0x3222d0) {
         wouldDie = true;
     }
-    deaths += -1;
-    frames += -1;
 
     return death(self, go, powerrangers);
 }
