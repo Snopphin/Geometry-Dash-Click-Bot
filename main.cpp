@@ -214,6 +214,7 @@ static float i2 = 0.1;
 static int srelease = 0;
 static bool hard = false;
 static bool console = false;
+static bool bathroom = false;
 long __fastcall RenderMain()
 {
 
@@ -403,32 +404,7 @@ long __fastcall RenderMain()
 
             }
         }
-        static bool nowae = false;
-        if (ImGui::Checkbox("Enable No Wave", &nowae))//not finished
-        {
-            DWORD baseGame = reinterpret_cast<DWORD>(GetModuleHandle(0));
-            DWORD oldProtect;
-            VirtualProtect(reinterpret_cast<void*>(baseGame + 0x1E8688), 6, PAGE_EXECUTE_READWRITE, &oldProtect);
 
-
-
-
-            memcpy_s(reinterpret_cast<void*>(baseGame + 0x1E8688), 6, "\xF3\x0F\x10\x05\x00\x00\x00\x00", 7);
-            VirtualProtect(reinterpret_cast<void*>(baseGame + 0x1E8688), 6, oldProtect, &oldProtect);
-
-
-
-            if (nowae == false)
-            {
-                DWORD baseGame = reinterpret_cast<DWORD>(GetModuleHandle(0));
-                DWORD oldProtect;
-                VirtualProtect(reinterpret_cast<void*>(baseGame + 0x00000), 6, PAGE_EXECUTE_READWRITE, &oldProtect);
-
-                memcpy_s(reinterpret_cast<void*>(baseGame + 0x00000), 6, "\x00", 6);
-                VirtualProtect(reinterpret_cast<void*>(baseGame + 0x00000), 6, oldProtect, &oldProtect);
-            }
-        }
-    
     
     
         if (ImGui::Checkbox("Enable Noclip", &checked))
@@ -533,6 +509,7 @@ long __fastcall RenderMain()
                 }
             }
         }
+
         if (ImGui::Checkbox("Enable Pratice Hack", &pressed))
         {
             {
@@ -1038,12 +1015,53 @@ long __fastcall RenderMain()
         {
         Fps(sliderlol2);
         }
+        if (ImGui::Button("Inject Dll")) {
+            std::string stringpath = chooseDLL();
+            const char* DllPath = stringpath.c_str();
 
+            // Open a handle to target process
+            HWND hWnd = FindWindow(0, "Geometry Dash");
+
+            if (hWnd == 0)
+            {
+                MessageBox(0, "Error cannot find window.", "Error", MB_OK | MB_ICONERROR);
+            }
+            else
+            {
+                DWORD proccess_ID;
+                GetWindowThreadProcessId(hWnd, &proccess_ID);
+                HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, proccess_ID);
+
+                // Allocate memory for the dllpath in the target process
+                // length of the path string + null terminator
+                LPVOID pDllPath = VirtualAllocEx(hProcess, 0, strlen(DllPath) + 1,
+                    MEM_COMMIT, PAGE_READWRITE);
+
+                // Write the path to the address of the memory we just allocated
+                // in the target process
+                WriteProcessMemory(hProcess, pDllPath, (LPVOID)DllPath,
+                    strlen(DllPath) + 1, 0);
+
+                // Create a Remote Thread in the target process which
+                // calls LoadLibraryA as our dllpath as an argument -> program loads our dll
+                HANDLE hLoadThread = CreateRemoteThread(hProcess, 0, 0,
+                    (LPTHREAD_START_ROUTINE)GetProcAddress(GetModuleHandleA("Kernel32.dll"),
+                        "LoadLibraryA"), pDllPath, 0, 0);
+
+                // Wait for the execution of our loader thread to finish
+                WaitForSingleObject(hLoadThread, INFINITE);
+
+                std::cout << "Dll path allocated at: " << std::hex << pDllPath << std::endl;
+                std::cin.get();
+
+                // Free the memory allocated for our dll path
+                VirtualFreeEx(hProcess, pDllPath, strlen(DllPath) + 1, MEM_RELEASE);
+            }
+        }
         ImGui::End();
         ImGui::Begin("CBot 1.1");
         ImGui::SetWindowSize(ImVec2(180, 180));
         static bool disabled = false;
-
         static bool bot = false;
         if (ImGui::Checkbox("Enable CBot", &CBoot))
         {
@@ -1098,6 +1116,10 @@ long __fastcall RenderMain()
         {
 
         }
+        if (ImGui::Checkbox("Enable Bathroom preset", &bathroom))
+        {
+
+        }
         using namespace irrklang;
         static bool lolgay2 = false;
         if (ImGui::Checkbox("Enable Pc Noise", &lol2))
@@ -1134,52 +1156,7 @@ long __fastcall RenderMain()
  
             }
             return 0;
-        }
-        static int sliderInt2 = 0.f;
-        if (ImGui::SliderInt)
-        if (ImGui::Button("Inject Dll")) {
-            std::string stringpath = chooseDLL();
-            const char* DllPath = stringpath.c_str();
-
-            // Open a handle to target process
-            HWND hWnd = FindWindow(0, "Geometry Dash");
-
-            if (hWnd == 0)
-            {
-                MessageBox(0, "Error cannot find window.", "Error", MB_OK | MB_ICONERROR);
-            }
-            else
-            {
-                DWORD proccess_ID;
-                GetWindowThreadProcessId(hWnd, &proccess_ID);
-                HANDLE hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, proccess_ID);
-
-                // Allocate memory for the dllpath in the target process
-                // length of the path string + null terminator
-                LPVOID pDllPath = VirtualAllocEx(hProcess, 0, strlen(DllPath) + 1,
-                    MEM_COMMIT, PAGE_READWRITE);
-
-                // Write the path to the address of the memory we just allocated
-                // in the target process
-                WriteProcessMemory(hProcess, pDllPath, (LPVOID)DllPath,
-                    strlen(DllPath) + 1, 0);
-
-                // Create a Remote Thread in the target process which
-                // calls LoadLibraryA as our dllpath as an argument -> program loads our dll
-                HANDLE hLoadThread = CreateRemoteThread(hProcess, 0, 0,
-                    (LPTHREAD_START_ROUTINE)GetProcAddress(GetModuleHandleA("Kernel32.dll"),
-                        "LoadLibraryA"), pDllPath, 0, 0);
-
-                // Wait for the execution of our loader thread to finish
-                WaitForSingleObject(hLoadThread, INFINITE);
-
-                std::cout << "Dll path allocated at: " << std::hex << pDllPath << std::endl;
-                std::cin.get();
-
-                // Free the memory allocated for our dll path
-                VirtualFreeEx(hProcess, pDllPath, strlen(DllPath) + 1, MEM_RELEASE);
-            }
-
+        
         }
 
     
@@ -1345,6 +1322,28 @@ const int MAX_SIZE = 26;
 
 static float j2 = 0.0;
 static int is = 0;
+namespace fmlol
+{
+    FMOD::System* system = nullptr;
+    FMOD_RESULT result;
+    FMOD::Reverb3D* reverb;
+}
+bool __fastcall Soft::InitFMOD(CCLayer* self, int edx, void* GJGameLevel)
+{
+    if (cbotbutdis == true)
+    {
+            fmlol::result = FMOD::System_Create(&fmlol::system);
+            fmlol::result = fmlol::system->init(512, FMOD_INIT_NORMAL, nullptr);
+            if (bathroom == true)
+            {
+                fmlol::result = fmlol::system->createReverb3D(&fmlol::reverb);
+                FMOD_REVERB_PROPERTIES prop2 = FMOD_PRESET_BATHROOM;
+                fmlol::reverb->setProperties(&prop2);
+            }
+    }
+    return Soft::initfm(self, GJGameLevel);
+}
+
 void __fastcall Soft::hkSoft(cocos2d::CCLayer* self, void* edx, float delta)
 {
     auto gm = gd::GameManager::sharedState();
@@ -1353,26 +1352,11 @@ void __fastcall Soft::hkSoft(cocos2d::CCLayer* self, void* edx, float delta)
 
     if (play_layer)
     {
-        is += 1;
-        if (is == 1)
-        {
-            FMOD_RESULT result;
 
-
-            FMOD::System* system = nullptr;
-
-            result = FMOD::System_Create(&system);
-
-            result = system->init(512, FMOD_INIT_NORMAL, nullptr);
-            FMOD::ChannelGroup* channelGroup = nullptr;
-
-            result = system->createChannelGroup("for fuck sake", &channelGroup);
-        }
             if (cbotbutdis == true)
             {
-                i2 += 0.0273;
-                i3 += 0.0273;
-
+                i2 += 0.0262;
+                i3 += 0.0262;
                 if (sclick < 0)
                 {
                     sclick += 1;
@@ -1386,7 +1370,7 @@ void __fastcall Soft::hkSoft(cocos2d::CCLayer* self, void* edx, float delta)
                 {
                     sclick -= 0.001;
                     i2 = 0;
-                    sclick += 0.0005;
+                    sclick += 0.00075;
                 }
 
 
@@ -1404,7 +1388,7 @@ void __fastcall Soft::hkSoft(cocos2d::CCLayer* self, void* edx, float delta)
                 {
                     srelease -= 0.001;
                     i3 = 0;
-                    srelease += 0.0005;
+                    srelease += 0.00075;
                 }
             }
         
@@ -1420,18 +1404,18 @@ void Soft::mem_init() {
         (PVOID)(base + 0x2029C0),
         Soft::hkSoft,
         (LPVOID*)&Soft::SF);
+    MH_CreateHook(
+        (PVOID)(base + 0x01FB780),
+        Soft::InitFMOD,
+        (LPVOID*)&Soft::initfm);
 }
 
 
 void holdran()
 {
- 
-    FMOD_RESULT result;
 
-    
-    FMOD::System* system = nullptr;
-    result = FMOD::System_Create(&system);
-    result = system->init(512, FMOD_INIT_NORMAL, nullptr);
+    int intertget = 0;
+    intertget += 1;
     FMOD::Sound* sound = nullptr;
     FMOD::Sound* sound2 = nullptr;
     FMOD::Sound* sound3 = nullptr;
@@ -1459,57 +1443,32 @@ void holdran()
 
         if (sclick == 1)
         {
-            system->createSound(click.c_str(), FMOD_DEFAULT, nullptr, &sound);
-
-            result = system->playSound(sound, nullptr, false, &channel);
-
-
-
+            fmlol::system->createSound(click.c_str(), FMOD_DEFAULT, nullptr, &sound);
+            fmlol::result = fmlol::system->playSound(sound, nullptr, false, &channel);
+            channel->setVolume(setv);
             bool isPlaying1 = false;
             do {
-
-
- 
-                system->update();
+                fmlol::system->update();
             } while (isPlaying1);
         }
         if (sclick == 2)
         {
-            system->createSound(click.c_str(), FMOD_DEFAULT, nullptr, &sound2);
-
-   
-            result = system->playSound(sound2, nullptr, false, &channel2);
-
-
-
-
-
+            fmlol::system->createSound(click.c_str(), FMOD_DEFAULT, nullptr, &sound2);
+            fmlol::result = fmlol::system->playSound(sound2, nullptr, false, &channel2);
+            channel2->setVolume(setv);
             bool isPlaying2 = false;
             do {
-
-
-
-                system->update();
+                fmlol::system->update();
             } while (isPlaying2);
         }
         if (sclick > 2)
         {
-            system->createSound(ss.c_str(), FMOD_DEFAULT, nullptr, &sound3);
-
-            // Play the sound.
-
-            result = system->playSound(sound3, nullptr, false, &channel3);
-
-
-
-
-
+            fmlol::system->createSound(ss.c_str(), FMOD_DEFAULT, nullptr, &sound3);
+            fmlol::result = fmlol::system->playSound(sound3, nullptr, false, &channel3);
+            channel3->setVolume(setv);
             bool isPlaying3 = false;
             do {
-
-
-
-                system->update();
+                fmlol::system->update();
             } while (isPlaying3);
         }
        i2 += 0.1;
@@ -1539,20 +1498,11 @@ void holdran()
 
     }
 }
-static int intertget = 0;
+
 void releaseran()
 {
-
-    FMOD_RESULT result;
-
-    intertget += 1;
-    FMOD::System* system = nullptr;
-
-    result = FMOD::System_Create(&system);
-    if (intertget)
-    result = system->init(512, FMOD_INIT_NORMAL, nullptr);
-
-    
+    int intertget2 = 0;
+    intertget2 += 1;
     FMOD::Sound* sound = nullptr;
     FMOD::Sound* sound2 = nullptr;
     FMOD::Sound* sound3 = nullptr;
@@ -1563,7 +1513,6 @@ void releaseran()
     auto play_layer = gm->getPlayLayer();
     if (play_layer)
     {
-        ISoundEngine* engine = createIrrKlangDevice();
         srelease += 1;
         unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
         srand(seed);
@@ -1580,57 +1529,34 @@ void releaseran()
 
         if (srelease == 1) 
         {
-            system->createSound(click.c_str(), FMOD_DEFAULT, nullptr, &sound);
-
-            result = system->playSound(sound, nullptr, false, &channel);
-
-
-
+            fmlol::system->createSound(click.c_str(), FMOD_DEFAULT, nullptr, &sound);
+            fmlol::result = fmlol::system->playSound(sound, nullptr, false, &channel);
+            channel->setVolume(setv);
             bool isPlaying1 = false;
             do {
-
-
-
-                system->update();
+                fmlol::system->update();
             } while (isPlaying1);
         }
         if (srelease == 2)
         {
-
-            system->createSound(click.c_str(), FMOD_DEFAULT, nullptr, &sound2);
-
-    
-
-            result = system->playSound(sound2, nullptr, false, &channel2);
-
-
-
+            fmlol::system->createSound(click.c_str(), FMOD_DEFAULT, nullptr, &sound2);
+            fmlol::result = fmlol::system->playSound(sound2, nullptr, false, &channel2);
+            channel2->setVolume(setv);
             bool isPlaying2 = false;
             do {
-
-
-
-                system->update();
+                fmlol::system->update();
             } while (isPlaying2);
         }
         if (srelease > 2)
         {
             auto fm = gd::FMODAudioEngine::sharedEngine();
             fm->preloadEffect(click.c_str());
-            system->createSound(click.c_str(), FMOD_DEFAULT, nullptr, &sound3);
-
-
-
-            result = system->playSound(sound3, nullptr, false, &channel3);
-
-
-
+            fmlol::system->createSound(click.c_str(), FMOD_DEFAULT, nullptr, &sound3);
+            fmlol::result = fmlol::system->playSound(sound3, nullptr, false, &channel3);
+            channel3->setVolume(setv);
             bool isPlaying1 = false;
             do {
-
-
-
-                system->update();
+                fmlol::system->update();
             } while (isPlaying1);
 
         }
