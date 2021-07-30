@@ -124,9 +124,6 @@ std::string chooseDLL()
 
 static bool on = true;
 
-DWORD __declspec(dllexport) WINAPI Hooking(void* hModule) {
-    return 0;
-}
 
 void WriteBytes(void* location, std::vector<BYTE> bytes) { //thx to fig
     DWORD old_prot;
@@ -215,6 +212,7 @@ static int srelease = 0;
 static bool hard = false;
 static bool console = false;
 static bool bathroom = false;
+static int fpsofmacro = 120;
 long __fastcall RenderMain()
 {
 
@@ -1003,11 +1001,12 @@ long __fastcall RenderMain()
             }
         }        
         static float sliderlol = 1.f;
-        if (ImGui::InputFloat("Speed", &sliderlol, 0.1f, 1.0f))
+        if (ImGui::InputFloat("Speed", &sliderlol, 0.1f, 1.f))
         {
 
             Speedhack::Setup();
             Speedhack::SetSpeed(sliderlol);
+            SpeedhackAudio::init();
             SpeedhackAudio::set(sliderlol);
         }
         static int sliderlol2 = 60;
@@ -1113,6 +1112,10 @@ long __fastcall RenderMain()
 
         }
         if (ImGui::InputFloat("Set Volume of clicks", &setv, 0.1, 9.0))
+        {
+
+        }
+        if (ImGui::InputInt("Fps Of Replay", &fpsofmacro))
         {
 
         }
@@ -1328,12 +1331,19 @@ namespace fmlol
     FMOD_RESULT result;
     FMOD::Reverb3D* reverb;
 }
+static int fmodone = 0;
 bool __fastcall Soft::InitFMOD(CCLayer* self, int edx, void* GJGameLevel)
 {
     if (cbotbutdis == true)
     {
-            fmlol::result = FMOD::System_Create(&fmlol::system);
-            fmlol::result = fmlol::system->init(512, FMOD_INIT_NORMAL, nullptr);
+            fmodone += 1;
+            if (fmodone < 2) //only once calls fmod init
+            {
+                fmlol::result = FMOD::System_Create(&fmlol::system);
+                fmlol::result = fmlol::system->init(512, FMOD_INIT_NORMAL, nullptr);
+
+            }
+
             if (bathroom == true)
             {
                 fmlol::result = fmlol::system->createReverb3D(&fmlol::reverb);
@@ -1355,40 +1365,329 @@ void __fastcall Soft::hkSoft(cocos2d::CCLayer* self, void* edx, float delta)
 
             if (cbotbutdis == true)
             {
-                i2 += 0.0262;
-                i3 += 0.0262;
-                if (sclick < 0)
+                if (fpsofmacro < 60)
                 {
-                    sclick += 1;
+                    i2 += 0.035;
+                    i3 += 0.035;
+                    if (sclick < 0)
+                    {
+                        sclick += 1;
 
-                }
-                if (sclick > 3)
-                {
-                    sclick -= 1;
-                }
-                if (i2 > 1)
-                {
-                    sclick -= 0.001;
-                    i2 = 0;
-                    sclick += 0.00075;
-                }
+                    }
+                    if (sclick > 3)
+                    {
+                        sclick -= 1;
+                    }
+                    if (i2 > 1)
+                    {
+                        sclick -= 0.003;
+                        i2 = 0;
+                    }
 
 
 
-                if (srelease < 0)
-                {
-                    srelease += 1;
+                    if (srelease < 0)
+                    {
+                        srelease += 1;
 
+                    }
+                    if (srelease > 3)
+                    {
+                        srelease -= 1;
+                    }
+                    if (i3 > 1)
+                    {
+                        srelease -= 0.003;
+                        i3 = 0;
+                    }
                 }
-                if (srelease > 3)
+                if (fpsofmacro == 90)
                 {
-                    srelease -= 1;
+                    i2 += 0.03;
+                    i3 += 0.03;
+                    if (sclick < 0)
+                    {
+                        sclick += 1;
+
+                    }
+                    if (sclick > 3)
+                    {
+                        sclick -= 1;
+                    }
+                    if (i2 > 1)
+                    {
+                        sclick -= 0.002;
+                        i2 = 0;
+                    }
+
+
+
+                    if (srelease < 0)
+                    {
+                        srelease += 1;
+
+                    }
+                    if (srelease > 3)
+                    {
+                        srelease -= 1;
+                    }
+                    if (i3 > 1)
+                    {
+                        srelease -= 0.002;
+                        i3 = 0;
+                    }
                 }
-                if (i3 > 1)
+                if (fpsofmacro == 120)
                 {
-                    srelease -= 0.001;
-                    i3 = 0;
-                    srelease += 0.00075;
+                    i2 += 0.0288;
+                    i3 += 0.0288;
+                    if (sclick < 0)
+                    {
+                        sclick += 1;
+
+                    }
+                    if (sclick > 3)
+                    {
+                        sclick -= 1;
+                    }
+                    if (i2 > 1)
+                    {
+                        sclick -= 0.002;
+                        i2 = 0;
+                    }
+
+
+
+                    if (srelease < 0)
+                    {
+                        srelease += 1;
+
+                    }
+                    if (srelease > 3)
+                    {
+                        srelease -= 1;
+                    }
+                    if (i3 > 1)
+                    {
+                        srelease -= 0.002;
+                        i3 = 0;
+                    }
+                }
+                if (fpsofmacro == 144)
+                {
+                    i2 += 0.0242;
+                    i3 += 0.0242;
+                    if (sclick < 0)
+                    {
+                        sclick += 1;
+
+                    }
+                    if (sclick > 3)
+                    {
+                        sclick -= 1;
+                    }
+                    if (i2 > 1)
+                    {
+                        sclick -= 0.002;
+                        i2 = 0;
+                    }
+
+
+
+                    if (srelease < 0)
+                    {
+                        srelease += 1;
+
+                    }
+                    if (srelease > 3)
+                    {
+                        srelease -= 1;
+                    }
+                    if (i3 > 1)
+                    {
+                        srelease -= 0.002;
+                        i3 = 0;
+                    }
+                }
+                if (fpsofmacro == 240)
+                {
+                    i2 += 0.0233;
+                    i3 += 0.0233;
+                    if (sclick < 0)
+                    {
+                        sclick += 1;
+
+                    }
+                    if (sclick > 3)
+                    {
+                        sclick -= 1;
+                    }
+                    if (i2 > 1)
+                    {
+                        sclick -= 0.0015;
+                        i2 = 0;
+                    }
+
+
+
+                    if (srelease < 0)
+                    {
+                        srelease += 1;
+
+                    }
+                    if (srelease > 3)
+                    {
+                        srelease -= 1;
+                    }
+                    if (i3 > 1)
+                    {
+                        srelease -= 0.0015;
+                        i3 = 0;
+                    }
+                }
+                if (fpsofmacro == 288)
+                {
+                    i2 += 0.01;
+                    i3 += 0.01;
+                    if (sclick < 0)
+                    {
+                        sclick += 1;
+
+                    }
+                    if (sclick > 3)
+                    {
+                        sclick -= 1;
+                    }
+                    if (i2 > 1)
+                    {
+                        sclick -= 0.0012;
+                        i2 = 0;
+                    }
+
+
+
+                    if (srelease < 0)
+                    {
+                        srelease += 1;
+
+                    }
+                    if (srelease > 3)
+                    {
+                        srelease -= 1;
+                    }
+                    if (i3 > 1)
+                    {
+                        srelease -= 0.0012;
+                        i3 = 0;
+                    }
+                }
+                if (fpsofmacro == 360)
+                {
+                    i2 += 0.0085;
+                    i3 += 0.0085;
+                    if (sclick < 0)
+                    {
+                        sclick += 1;
+
+                    }
+                    if (sclick > 3)
+                    {
+                        sclick -= 1;
+                    }
+                    if (i2 > 1)
+                    {
+                        sclick -= 0.0010;
+                        i2 = 0;
+                    }
+
+
+
+                    if (srelease < 0)
+                    {
+                        srelease += 1;
+
+                    }
+                    if (srelease > 3)
+                    {
+                        srelease -= 1;
+                    }
+                    if (i3 > 1)
+                    {
+                        srelease -= 0.0010;
+                        i3 = 0;
+                    }
+                }
+                if (fpsofmacro == 480)
+                {
+                    i2 += 0.004;
+                    i3 += 0.004;
+                    if (sclick < 0)
+                    {
+                        sclick += 1;
+
+                    }
+                    if (sclick > 3)
+                    {
+                        sclick -= 1;
+                    }
+                    if (i2 > 1)
+                    {
+                        sclick -= 0.004;
+                        i2 = 0;
+                    }
+
+
+
+                    if (srelease < 0)
+                    {
+                        srelease += 1;
+
+                    }
+                    if (srelease > 3)
+                    {
+                        srelease -= 1;
+                    }
+                    if (i3 > 1)
+                    {
+                        srelease -= 0.004;
+                        i3 = 0;
+                    }
+                }
+                if (fpsofmacro > 480) 
+                {
+                    i2 += 0.001;
+                    i3 += 0.001;
+                    if (sclick < 0)
+                    {
+                        sclick += 1;
+
+                    }
+                    if (sclick > 3)
+                    {
+                        sclick -= 1;
+                    }
+                    if (i2 > 1)
+                    {
+                        sclick -= 0.00255;
+                        i2 = 0;
+                    }
+
+
+
+                    if (srelease < 0)
+                    {
+                        srelease += 1;
+
+                    }
+                    if (srelease > 3)
+                    {
+                        srelease -= 1;
+                    }
+                    if (i3 > 1)
+                    {
+                        srelease -= 0.00255;
+                        i3 = 0;
+                    }
                 }
             }
         
@@ -1432,7 +1731,7 @@ void holdran()
         int n = 1;
         
         auto clicks = std::vector<std::string>{ "Clicks//clicks//1.wav", "Clicks//clicks//2.wav", "Clicks//clicks//3.wav", "Clicks//clicks//4.wav", "Clicks//clicks//5.wav", "Clicks//clicks//6.wav", "Clicks//clicks//7.wav", "Clicks//clicks//8.wav", "Clicks//clicks//9.wav", "Clicks//clicks//10.wav","Clicks//clicks//11.wav", "Clicks//clicks//12.wav", "Clicks//clicks//13.wav", "Clicks//clicks//14.wav", "Clicks//clicks//15.wav", "Clicks//clicks//16.wav", "Clicks//clicks//17.wav", "Clicks//clicks//18.wav", "Clicks//clicks//19.wav", "Clicks//clicks//20.wav", "Clicks//clicks//21.wav", "Clicks//clicks//22.wav" };
-        auto sclicks = std::vector<std::string>{ "Clicks//softClicks//1.wav", "Clicks//softClicks//2.wav", "Clicks//softClicks//3.wav", "Clicks//softClicks//4.wav", "Clicks//softClicks//5.wav" "Clicks//softClicks//6.wav" "Clicks//softClicks//7.wav" "Clicks//softClicks//8.wav" "Clicks//softClicks//9.wav" "Clicks//softClicks//10.wav" "Clicks//softClicks//11.wav" };
+        auto sclicks = std::vector<std::string>{ "Clicks//softClicks//1.wav", "Clicks//softClicks//2.wav", "Clicks//softClicks//3.wav", "Clicks//softClicks//4.wav", "Clicks//softClicks//5.wav", "Clicks//softClicks//6.wav", "Clicks//softClicks//7.wav", "Clicks//softClicks//8.wav", "Clicks//softClicks//9.wav", "Clicks//softClicks//10.wav", "Clicks//softClicks//11.wav", "Clicks//softClicks//12.wav" };
         std::string click = "";
         std::string ss = "";
         for (int i = 0; i < n; i++)
@@ -1456,10 +1755,10 @@ void holdran()
             fmlol::system->createSound(click.c_str(), FMOD_DEFAULT, nullptr, &sound2);
             fmlol::result = fmlol::system->playSound(sound2, nullptr, false, &channel2);
             channel2->setVolume(setv);
-            bool isPlaying2 = false;
+            bool isPlaying1 = false;
             do {
                 fmlol::system->update();
-            } while (isPlaying2);
+            } while (isPlaying1);
         }
         if (sclick > 2)
         {
@@ -1471,13 +1770,6 @@ void holdran()
                 fmlol::system->update();
             } while (isPlaying3);
         }
-       i2 += 0.1;
-       if (i2 > 1)
-       {
-       /* sclick -= 2;
-       i2 = 0;
-       */
-       }
        if (console == true)
        {
            AllocConsole();
@@ -1485,11 +1777,11 @@ void holdran()
            std::ifstream conin("CONIN$", std::ios::in);
            std::cout.rdbuf(conout.rdbuf());
            std::cin.rdbuf(conin.rdbuf());
-           if (sclick < 3)
+           if (sclick < 2)
            {
                std::cout << click << "" << std::endl;
            }
-           if (sclick > 2)
+           if (sclick > 1)
            {
                std::cout << ss << "" << std::endl;
            }
@@ -1537,21 +1829,19 @@ void releaseran()
                 fmlol::system->update();
             } while (isPlaying1);
         }
-        if (srelease == 2)
+        if (sclick == 2)
         {
             fmlol::system->createSound(click.c_str(), FMOD_DEFAULT, nullptr, &sound2);
             fmlol::result = fmlol::system->playSound(sound2, nullptr, false, &channel2);
             channel2->setVolume(setv);
-            bool isPlaying2 = false;
+            bool isPlaying1 = false;
             do {
                 fmlol::system->update();
-            } while (isPlaying2);
+            } while (isPlaying1);
         }
-        if (srelease > 2)
+        if (srelease > 2) 
         {
-            auto fm = gd::FMODAudioEngine::sharedEngine();
-            fm->preloadEffect(click.c_str());
-            fmlol::system->createSound(click.c_str(), FMOD_DEFAULT, nullptr, &sound3);
+            fmlol::system->createSound(sre.c_str(), FMOD_DEFAULT, nullptr, &sound3);
             fmlol::result = fmlol::system->playSound(sound3, nullptr, false, &channel3);
             channel3->setVolume(setv);
             bool isPlaying1 = false;
@@ -1561,7 +1851,7 @@ void releaseran()
 
         }
         
-        i3 += 0.1;
+        i3 += 0.2;
         if (i3 > 1)
         {
         }
@@ -1572,11 +1862,11 @@ void releaseran()
             std::ifstream conin("CONIN$", std::ios::in);
             std::cout.rdbuf(conout.rdbuf());
             std::cin.rdbuf(conin.rdbuf());
-            if (srelease < 3)
+            if (srelease < 2)
             {
                 std::cout << click << "" << std::endl;
             }
-            if (sclick > 2)
+            if (sclick > 1)
             {
                 std::cout << sre << "" << std::endl;
             }
@@ -1786,7 +2076,6 @@ void PlayerObject::mem_init()
 		case DLL_PROCESS_ATTACH:
 			DisableThreadLibraryCalls(hMod); 
 			ImGuiHook::Load(RenderMain);
-            CreateThread(0, 0x1000, Hooking, hMod, 0, 0);
 			break;
 		case DLL_PROCESS_DETACH:
             MH_Uninitialize();
