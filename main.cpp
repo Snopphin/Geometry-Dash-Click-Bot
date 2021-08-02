@@ -125,15 +125,6 @@ std::string chooseDLL()
 static bool on = true;
 
 
-void WriteBytes(void* location, std::vector<BYTE> bytes) { //thx to fig
-    DWORD old_prot;
-    VirtualProtect(location, bytes.size(), PAGE_EXECUTE_READWRITE, &old_prot);
-
-    memcpy(location, bytes.data(), bytes.size());
-
-    VirtualProtect(location, bytes.size(), old_prot, &old_prot);
-}
-
 
 
 static HWND window = NULL;
@@ -213,6 +204,8 @@ static bool hard = false;
 static bool console = false;
 static bool bathroom = false;
 static int fpsofmacro = 120;
+static bool softclicks = false;
+static bool esoftclicks = false;
 long __fastcall RenderMain()
 {
 
@@ -281,6 +274,8 @@ long __fastcall RenderMain()
         show = !show;
         
     }
+
+
     if (show) {
         static bool checked = false;
         static bool checkBox = false;
@@ -402,8 +397,81 @@ long __fastcall RenderMain()
 
             }
         }
+        static bool nosiold = false;
+        if (ImGui::Checkbox("Enable Solid Wave Trail", &nosiold))
+        {
+            {
+                size_t base = (size_t)GetModuleHandle(0);
+                std::vector<std::string> v;
+                char* dir;
+                std::string str;
 
-    
+
+
+                int value = 3196096656;
+                dir = new char[MAX_PATH];
+                DWORD ptr = (DWORD)(dir), addr = (DWORD)GetModuleHandleA("GeometryDash.exe") + 0x1E8162, old;
+
+                VirtualProtect((void*)addr, MAX_PATH, PAGE_EXECUTE_READWRITE, &old);
+                WriteProcessMemory(GetCurrentProcess(), (LPVOID)(addr), &value, 4, NULL);
+
+                strcpy(dir, "test");
+            }
+            {
+                size_t base = (size_t)GetModuleHandle(0);
+                std::vector<std::string> v;
+                char* dir;
+                std::string str;
+
+
+
+                int value = 2257293456;
+                dir = new char[MAX_PATH];
+                DWORD ptr = (DWORD)(dir), addr = (DWORD)GetModuleHandleA("GeometryDash.exe") + 0x1E816B, old;
+
+                VirtualProtect((void*)addr, MAX_PATH, PAGE_EXECUTE_READWRITE, &old);
+                WriteProcessMemory(GetCurrentProcess(), (LPVOID)(addr), &value, 4, NULL);
+
+                strcpy(dir, "test");
+            }
+            if (nosiold == false)
+            {
+                {
+                    size_t base = (size_t)GetModuleHandle(0);
+                    std::vector<std::string> v;
+                    char* dir;
+                    std::string str;
+
+
+
+                    int value = 3196065909;
+                    dir = new char[MAX_PATH];
+                    DWORD ptr = (DWORD)(dir), addr = (DWORD)GetModuleHandleA("GeometryDash.exe") + 0x1E8162, old;
+
+                    VirtualProtect((void*)addr, MAX_PATH, PAGE_EXECUTE_READWRITE, &old);
+                    WriteProcessMemory(GetCurrentProcess(), (LPVOID)(addr), &value, 17, NULL);
+
+                    strcpy(dir, "test");
+                }
+                {
+                    size_t base = (size_t)GetModuleHandle(0);
+                    std::vector<std::string> v;
+                    char* dir;
+                    std::string str;
+
+
+
+                    int value = 2257260405;
+                    dir = new char[MAX_PATH];
+                    DWORD ptr = (DWORD)(dir), addr = (DWORD)GetModuleHandleA("GeometryDash.exe") + 0x1E816B, old;
+
+                    VirtualProtect((void*)addr, MAX_PATH, PAGE_EXECUTE_READWRITE, &old);
+                    WriteProcessMemory(GetCurrentProcess(), (LPVOID)(addr), &value, 17, NULL);
+
+                    strcpy(dir, "test");
+                }
+            }
+        }
     
         if (ImGui::Checkbox("Enable Noclip", &checked))
         {
@@ -1119,10 +1187,19 @@ long __fastcall RenderMain()
         {
 
         }
-        if (ImGui::Checkbox("Enable Bathroom preset", &bathroom))
+        if (ImGui::Checkbox("Enable Soft Clicks", &softclicks))
+        {
+            esoftclicks = true;
+            if (softclicks == false)
+            {
+                esoftclicks = false;
+            }
+        }
+        if (ImGui::Checkbox("Enable Hangar preset", &bathroom))
         {
 
         }
+
         using namespace irrklang;
         static bool lolgay2 = false;
         if (ImGui::Checkbox("Enable Pc Noise", &lol2))
@@ -1221,7 +1298,7 @@ bool __fastcall PlayLayer3::initHook2(CCLayer* self, int edx, void* GJGameLevel)
             CCLabelBMFont* textObj = CCLabelBMFont::create("Fps: ", "bigFont.fnt");
 
             textObj->setZOrder(1000);
-            textObj->setTag(10000);
+            textObj->setTag(100001);
 
             textObj->setScale(0.5);
             auto size = textObj->getScaledContentSize();
@@ -1264,7 +1341,6 @@ void __fastcall PlayLayer3::hkUpdate2(cocos2d::CCLayer* self, void* edx, float d
         if (wouldDie2) {
             wouldDie2 = false;
             if (totalDelta2 >= 1 && x != prevX2) {
-
                 deaths2 += 1;
                 
             }
@@ -1331,6 +1407,11 @@ namespace fmlol
     FMOD_RESULT result;
     FMOD::Reverb3D* reverb;
 }
+namespace fmclicks
+{
+    FMOD::Sound* sound = nullptr;
+    FMOD::Sound* ssound = nullptr;
+}
 static int fmodone = 0;
 bool __fastcall Soft::InitFMOD(CCLayer* self, int edx, void* GJGameLevel)
 {
@@ -1341,13 +1422,14 @@ bool __fastcall Soft::InitFMOD(CCLayer* self, int edx, void* GJGameLevel)
             {
                 fmlol::result = FMOD::System_Create(&fmlol::system);
                 fmlol::result = fmlol::system->init(512, FMOD_INIT_NORMAL, nullptr);
-
+                fmclicks::sound;
+                fmclicks::ssound;
             }
 
             if (bathroom == true)
             {
                 fmlol::result = fmlol::system->createReverb3D(&fmlol::reverb);
-                FMOD_REVERB_PROPERTIES prop2 = FMOD_PRESET_BATHROOM;
+                FMOD_REVERB_PROPERTIES prop2 = FMOD_PRESET_HANGAR;
                 fmlol::reverb->setProperties(&prop2);
             }
     }
@@ -1365,329 +1447,369 @@ void __fastcall Soft::hkSoft(cocos2d::CCLayer* self, void* edx, float delta)
 
             if (cbotbutdis == true)
             {
-                if (fpsofmacro < 60)
+                if (esoftclicks == true)
                 {
-                    i2 += 0.035;
-                    i3 += 0.035;
-                    if (sclick < 0)
+                    if (fpsofmacro < 60)
                     {
-                        sclick += 1;
+                        i2 += 0.035;
+                        i3 += 0.035;
+                        if (sclick < 0)
+                        {
+                            sclick += 1;
 
-                    }
-                    if (sclick > 3)
-                    {
-                        sclick -= 1;
-                    }
-                    if (i2 > 1)
-                    {
-                        sclick -= 0.003;
-                        i2 = 0;
-                    }
-
-
-
-                    if (srelease < 0)
-                    {
-                        srelease += 1;
-
-                    }
-                    if (srelease > 3)
-                    {
-                        srelease -= 1;
-                    }
-                    if (i3 > 1)
-                    {
-                        srelease -= 0.003;
-                        i3 = 0;
-                    }
-                }
-                if (fpsofmacro == 90)
-                {
-                    i2 += 0.03;
-                    i3 += 0.03;
-                    if (sclick < 0)
-                    {
-                        sclick += 1;
-
-                    }
-                    if (sclick > 3)
-                    {
-                        sclick -= 1;
-                    }
-                    if (i2 > 1)
-                    {
-                        sclick -= 0.002;
-                        i2 = 0;
-                    }
+                        }
+                        if (sclick > 3)
+                        {
+                            sclick -= 1;
+                        }
+                        if (i2 > 1)
+                        {
+                            sclick -= 0.003;
+                            i2 = 0;
+                        }
 
 
 
-                    if (srelease < 0)
-                    {
-                        srelease += 1;
+                        if (srelease < 0)
+                        {
+                            srelease += 1;
 
+                        }
+                        if (srelease > 3)
+                        {
+                            srelease -= 1;
+                        }
+                        if (i3 > 1)
+                        {
+                            srelease -= 0.003;
+                            i3 = 0;
+                        }
                     }
-                    if (srelease > 3)
+                    if (fpsofmacro == 60)
                     {
-                        srelease -= 1;
-                    }
-                    if (i3 > 1)
-                    {
-                        srelease -= 0.002;
-                        i3 = 0;
-                    }
-                }
-                if (fpsofmacro == 120)
-                {
-                    i2 += 0.0288;
-                    i3 += 0.0288;
-                    if (sclick < 0)
-                    {
-                        sclick += 1;
+                        i2 += 0.047;
+                        i3 += 0.047;
+                        if (sclick < 0)
+                        {
+                            sclick += 1;
 
-                    }
-                    if (sclick > 3)
-                    {
-                        sclick -= 1;
-                    }
-                    if (i2 > 1)
-                    {
-                        sclick -= 0.002;
-                        i2 = 0;
-                    }
-
-
-
-                    if (srelease < 0)
-                    {
-                        srelease += 1;
-
-                    }
-                    if (srelease > 3)
-                    {
-                        srelease -= 1;
-                    }
-                    if (i3 > 1)
-                    {
-                        srelease -= 0.002;
-                        i3 = 0;
-                    }
-                }
-                if (fpsofmacro == 144)
-                {
-                    i2 += 0.0242;
-                    i3 += 0.0242;
-                    if (sclick < 0)
-                    {
-                        sclick += 1;
-
-                    }
-                    if (sclick > 3)
-                    {
-                        sclick -= 1;
-                    }
-                    if (i2 > 1)
-                    {
-                        sclick -= 0.002;
-                        i2 = 0;
-                    }
+                        }
+                        if (sclick > 3)
+                        {
+                            sclick -= 1;
+                        }
+                        if (i2 > 1)
+                        {
+                            sclick -= 0.001;
+                            i2 = 0;
+                        }
 
 
 
-                    if (srelease < 0)
-                    {
-                        srelease += 1;
+                        if (srelease < 0)
+                        {
+                            srelease += 1;
 
+                        }
+                        if (srelease > 3)
+                        {
+                            srelease -= 1;
+                        }
+                        if (i3 > 1)
+                        {
+                            srelease -= 0.001;
+                            i3 = 0;
+                        }
                     }
-                    if (srelease > 3)
+                    if (fpsofmacro == 90)
                     {
-                        srelease -= 1;
-                    }
-                    if (i3 > 1)
-                    {
-                        srelease -= 0.002;
-                        i3 = 0;
-                    }
-                }
-                if (fpsofmacro == 240)
-                {
-                    i2 += 0.0233;
-                    i3 += 0.0233;
-                    if (sclick < 0)
-                    {
-                        sclick += 1;
+                        i2 += 0.042;
+                        i3 += 0.042;
+                        if (sclick < 0)
+                        {
+                            sclick += 1;
 
-                    }
-                    if (sclick > 3)
-                    {
-                        sclick -= 1;
-                    }
-                    if (i2 > 1)
-                    {
-                        sclick -= 0.0015;
-                        i2 = 0;
-                    }
-
-
-
-                    if (srelease < 0)
-                    {
-                        srelease += 1;
-
-                    }
-                    if (srelease > 3)
-                    {
-                        srelease -= 1;
-                    }
-                    if (i3 > 1)
-                    {
-                        srelease -= 0.0015;
-                        i3 = 0;
-                    }
-                }
-                if (fpsofmacro == 288)
-                {
-                    i2 += 0.01;
-                    i3 += 0.01;
-                    if (sclick < 0)
-                    {
-                        sclick += 1;
-
-                    }
-                    if (sclick > 3)
-                    {
-                        sclick -= 1;
-                    }
-                    if (i2 > 1)
-                    {
-                        sclick -= 0.0012;
-                        i2 = 0;
-                    }
+                        }
+                        if (sclick > 3)
+                        {
+                            sclick -= 1;
+                        }
+                        if (i2 > 1)
+                        {
+                            sclick -= 0.002;
+                            i2 = 0;
+                        }
 
 
 
-                    if (srelease < 0)
-                    {
-                        srelease += 1;
+                        if (srelease < 0)
+                        {
+                            srelease += 1;
 
+                        }
+                        if (srelease > 3)
+                        {
+                            srelease -= 1;
+                        }
+                        if (i3 > 1)
+                        {
+                            srelease -= 0.002;
+                            i3 = 0;
+                        }
                     }
-                    if (srelease > 3)
+                    if (fpsofmacro == 120)
                     {
-                        srelease -= 1;
-                    }
-                    if (i3 > 1)
-                    {
-                        srelease -= 0.0012;
-                        i3 = 0;
-                    }
-                }
-                if (fpsofmacro == 360)
-                {
-                    i2 += 0.0085;
-                    i3 += 0.0085;
-                    if (sclick < 0)
-                    {
-                        sclick += 1;
+                        i2 += 0.0288;
+                        i3 += 0.0288;
+                        if (sclick < 0)
+                        {
+                            sclick += 1;
 
-                    }
-                    if (sclick > 3)
-                    {
-                        sclick -= 1;
-                    }
-                    if (i2 > 1)
-                    {
-                        sclick -= 0.0010;
-                        i2 = 0;
-                    }
-
-
-
-                    if (srelease < 0)
-                    {
-                        srelease += 1;
-
-                    }
-                    if (srelease > 3)
-                    {
-                        srelease -= 1;
-                    }
-                    if (i3 > 1)
-                    {
-                        srelease -= 0.0010;
-                        i3 = 0;
-                    }
-                }
-                if (fpsofmacro == 480)
-                {
-                    i2 += 0.004;
-                    i3 += 0.004;
-                    if (sclick < 0)
-                    {
-                        sclick += 1;
-
-                    }
-                    if (sclick > 3)
-                    {
-                        sclick -= 1;
-                    }
-                    if (i2 > 1)
-                    {
-                        sclick -= 0.004;
-                        i2 = 0;
-                    }
+                        }
+                        if (sclick > 3)
+                        {
+                            sclick -= 1;
+                        }
+                        if (i2 > 1)
+                        {
+                            sclick -= 0.002;
+                            i2 = 0;
+                        }
 
 
 
-                    if (srelease < 0)
-                    {
-                        srelease += 1;
+                        if (srelease < 0)
+                        {
+                            srelease += 1;
 
+                        }
+                        if (srelease > 3)
+                        {
+                            srelease -= 1;
+                        }
+                        if (i3 > 1)
+                        {
+                            srelease -= 0.002;
+                            i3 = 0;
+                        }
                     }
-                    if (srelease > 3)
+                    if (fpsofmacro == 144)
                     {
-                        srelease -= 1;
-                    }
-                    if (i3 > 1)
-                    {
-                        srelease -= 0.004;
-                        i3 = 0;
-                    }
-                }
-                if (fpsofmacro > 480) 
-                {
-                    i2 += 0.001;
-                    i3 += 0.001;
-                    if (sclick < 0)
-                    {
-                        sclick += 1;
+                        i2 += 0.0242;
+                        i3 += 0.0242;
+                        if (sclick < 0)
+                        {
+                            sclick += 1;
 
-                    }
-                    if (sclick > 3)
-                    {
-                        sclick -= 1;
-                    }
-                    if (i2 > 1)
-                    {
-                        sclick -= 0.00255;
-                        i2 = 0;
-                    }
+                        }
+                        if (sclick > 3)
+                        {
+                            sclick -= 1;
+                        }
+                        if (i2 > 1)
+                        {
+                            sclick -= 0.002;
+                            i2 = 0;
+                        }
 
 
 
-                    if (srelease < 0)
-                    {
-                        srelease += 1;
+                        if (srelease < 0)
+                        {
+                            srelease += 1;
 
+                        }
+                        if (srelease > 3)
+                        {
+                            srelease -= 1;
+                        }
+                        if (i3 > 1)
+                        {
+                            srelease -= 0.002;
+                            i3 = 0;
+                        }
                     }
-                    if (srelease > 3)
+                    if (fpsofmacro == 240)
                     {
-                        srelease -= 1;
+                        i2 += 0.0155;
+                        i3 += 0.0155;
+                        if (sclick < 0)
+                        {
+                            sclick += 1;
+
+                        }
+                        if (sclick > 3)
+                        {
+                            sclick -= 1;
+                        }
+                        if (i2 > 1)
+                        {
+                            sclick -= 0.0015;
+                            i2 = 0;
+                        }
+
+
+
+                        if (srelease < 0)
+                        {
+                            srelease += 1;
+
+                        }
+                        if (srelease > 3)
+                        {
+                            srelease -= 1;
+                        }
+                        if (i3 > 1)
+                        {
+                            srelease -= 0.0015;
+                            i3 = 0;
+                        }
                     }
-                    if (i3 > 1)
+                    if (fpsofmacro == 288)
                     {
-                        srelease -= 0.00255;
-                        i3 = 0;
+                        i2 += 0.0124;
+                        i3 += 0.0124;
+                        if (sclick < 0)
+                        {
+                            sclick += 1;
+
+                        }
+                        if (sclick > 3)
+                        {
+                            sclick -= 1;
+                        }
+                        if (i2 > 1)
+                        {
+                            sclick -= 0.0013;
+                            i2 = 0;
+                        }
+
+
+
+                        if (srelease < 0)
+                        {
+                            srelease += 1;
+
+                        }
+                        if (srelease > 3)
+                        {
+                            srelease -= 1;
+                        }
+                        if (i3 > 1)
+                        {
+                            srelease -= 0.0013;
+                            i3 = 0;
+                        }
                     }
+                    if (fpsofmacro == 360)
+                    {
+                        i2 += 0.0083;
+                        i3 += 0.0083;
+                        if (sclick < 0)
+                        {
+                            sclick += 1;
+
+                        }
+                        if (sclick > 3)
+                        {
+                            sclick -= 1;
+                        }
+                        if (i2 > 1)
+                        {
+                            sclick -= 0.0010;
+                            i2 = 0;
+                        }
+
+
+
+                        if (srelease < 0)
+                        {
+                            srelease += 1;
+
+                        }
+                        if (srelease > 3)
+                        {
+                            srelease -= 1;
+                        }
+                        if (i3 > 1)
+                        {
+                            srelease -= 0.0010;
+                            i3 = 0;
+                        }
+                    }
+                    if (fpsofmacro == 480)
+                    {
+                        i2 += 0.004;
+                        i3 += 0.004;
+                        if (sclick < 0)
+                        {
+                            sclick += 1;
+
+                        }
+                        if (sclick > 3)
+                        {
+                            sclick -= 1;
+                        }
+                        if (i2 > 1)
+                        {
+                            sclick -= 0.004;
+                            i2 = 0;
+                        }
+
+
+
+                        if (srelease < 0)
+                        {
+                            srelease += 1;
+
+                        }
+                        if (srelease > 3)
+                        {
+                            srelease -= 1;
+                        }
+                        if (i3 > 1)
+                        {
+                            srelease -= 0.004;
+                            i3 = 0;
+                        }
+                    }
+                    if (fpsofmacro > 480)
+                    {
+                        i2 += 0.003;
+                        i3 += 0.003;
+                        if (sclick < 0)
+                        {
+                            sclick += 1;
+
+                        }
+                        if (sclick > 3)
+                        {
+                            sclick -= 1;
+                        }
+                        if (i2 > 1)
+                        {
+                            sclick -= 0.002;
+                            i2 = 0;
+                        }
+
+
+
+                        if (srelease < 0)
+                        {
+                            srelease += 1;
+
+                        }
+                        if (srelease > 3)
+                        {
+                            srelease -= 1;
+                        }
+                        if (i3 > 1)
+                        {
+                            srelease -= 0.002;
+                            i3 = 0;
+                        }
+                    }
+                    
                 }
             }
         
@@ -1709,15 +1831,8 @@ void Soft::mem_init() {
         (LPVOID*)&Soft::initfm);
 }
 
-
 void holdran()
 {
-
-    int intertget = 0;
-    intertget += 1;
-    FMOD::Sound* sound = nullptr;
-    FMOD::Sound* sound2 = nullptr;
-    FMOD::Sound* sound3 = nullptr;
     FMOD::Channel* channel = nullptr;
     FMOD::Channel* channel2 = nullptr;
     FMOD::Channel* channel3 = nullptr;
@@ -1725,7 +1840,10 @@ void holdran()
     auto play_layer = gm->getPlayLayer();
     if (play_layer)
     {
-        sclick += 1;
+        if (esoftclicks == true)
+        {
+            sclick += 1.55;
+        }
         unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
         srand(seed);
         int n = 1;
@@ -1739,36 +1857,48 @@ void holdran()
             click = click + clicks[rand() % num];
             ss = ss + sclicks[rand() % snum];
         }
-
-        if (sclick == 1)
+        if (esoftclicks == true)
         {
-            fmlol::system->createSound(click.c_str(), FMOD_DEFAULT, nullptr, &sound);
-            fmlol::result = fmlol::system->playSound(sound, nullptr, false, &channel);
+            if (sclick == 1)
+            {
+                fmlol::system->createSound(click.c_str(), FMOD_DEFAULT, nullptr, &fmclicks::sound);
+                fmlol::result = fmlol::system->playSound(fmclicks::sound, nullptr, false, &channel);
+                channel->setVolume(setv);
+                bool isPlaying1 = false;
+                do {
+                    fmlol::system->update();
+                } while (isPlaying1);
+            }
+            if (sclick == 2)
+            {
+                fmlol::system->createSound(click.c_str(), FMOD_DEFAULT, nullptr, &fmclicks::sound);
+                fmlol::result = fmlol::system->playSound(fmclicks::sound, nullptr, false, &channel2);
+                channel2->setVolume(setv);
+                bool isPlaying2 = false;
+                do {
+                    fmlol::system->update();
+                } while (isPlaying2);
+            }
+            if (sclick > 2)
+            {
+                fmlol::system->createSound(ss.c_str(), FMOD_DEFAULT, nullptr, &fmclicks::ssound);
+                fmlol::result = fmlol::system->playSound(fmclicks::ssound, nullptr, false, &channel3);
+                channel3->setVolume(setv);
+                bool isPlaying3 = false;
+                do {
+                    fmlol::system->update();
+                } while (isPlaying3);
+            }
+        }
+        if (esoftclicks == false)
+        {
+            fmlol::system->createSound(click.c_str(), FMOD_DEFAULT, nullptr, &fmclicks::sound);
+            fmlol::result = fmlol::system->playSound(fmclicks::sound, nullptr, false, &channel);
             channel->setVolume(setv);
             bool isPlaying1 = false;
             do {
                 fmlol::system->update();
             } while (isPlaying1);
-        }
-        if (sclick == 2)
-        {
-            fmlol::system->createSound(click.c_str(), FMOD_DEFAULT, nullptr, &sound2);
-            fmlol::result = fmlol::system->playSound(sound2, nullptr, false, &channel2);
-            channel2->setVolume(setv);
-            bool isPlaying1 = false;
-            do {
-                fmlol::system->update();
-            } while (isPlaying1);
-        }
-        if (sclick > 2)
-        {
-            fmlol::system->createSound(ss.c_str(), FMOD_DEFAULT, nullptr, &sound3);
-            fmlol::result = fmlol::system->playSound(sound3, nullptr, false, &channel3);
-            channel3->setVolume(setv);
-            bool isPlaying3 = false;
-            do {
-                fmlol::system->update();
-            } while (isPlaying3);
         }
        if (console == true)
        {
@@ -1793,11 +1923,7 @@ void holdran()
 
 void releaseran()
 {
-    int intertget2 = 0;
-    intertget2 += 1;
-    FMOD::Sound* sound = nullptr;
-    FMOD::Sound* sound2 = nullptr;
-    FMOD::Sound* sound3 = nullptr;
+
     FMOD::Channel* channel = nullptr;
     FMOD::Channel* channel2 = nullptr;
     FMOD::Channel* channel3 = nullptr;
@@ -1805,7 +1931,7 @@ void releaseran()
     auto play_layer = gm->getPlayLayer();
     if (play_layer)
     {
-        srelease += 1;
+        srelease += 1.55;
         unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
         srand(seed);
         int n = 1;
@@ -1818,42 +1944,49 @@ void releaseran()
         click = click + clicks[rand() % num]; //num 
         sre = sre + srele[rand() % snum]; //num 
         }
-
-        if (srelease == 1) 
+        if (esoftclicks == true)
         {
-            fmlol::system->createSound(click.c_str(), FMOD_DEFAULT, nullptr, &sound);
-            fmlol::result = fmlol::system->playSound(sound, nullptr, false, &channel);
+            if (srelease == 1)
+            {
+                fmlol::system->createSound(click.c_str(), FMOD_DEFAULT, nullptr, &fmclicks::sound);
+                fmlol::result = fmlol::system->playSound(fmclicks::sound, nullptr, false, &channel);
+                channel->setVolume(setv);
+                bool isPlaying1 = false;
+                do {
+                    fmlol::system->update();
+                } while (isPlaying1);
+            }
+            if (sclick == 2)
+            {
+                fmlol::system->createSound(click.c_str(), FMOD_DEFAULT, nullptr, &fmclicks::sound);
+                fmlol::result = fmlol::system->playSound(fmclicks::sound, nullptr, false, &channel2);
+                channel2->setVolume(setv);
+                bool isPlaying1 = false;
+                do {
+                    fmlol::system->update();
+                } while (isPlaying1);
+            }
+            if (srelease > 2)
+            {
+                fmlol::system->createSound(sre.c_str(), FMOD_DEFAULT, nullptr, &fmclicks::ssound);
+                fmlol::result = fmlol::system->playSound(fmclicks::ssound, nullptr, false, &channel3);
+                channel3->setVolume(setv);
+                bool isPlaying1 = false;
+                do {
+                    fmlol::system->update();
+                } while (isPlaying1);
+
+            }
+        }
+        if (esoftclicks == false)
+        {
+            fmlol::system->createSound(click.c_str(), FMOD_DEFAULT, nullptr, &fmclicks::sound);
+            fmlol::result = fmlol::system->playSound(fmclicks::sound, nullptr, false, &channel);
             channel->setVolume(setv);
             bool isPlaying1 = false;
             do {
                 fmlol::system->update();
             } while (isPlaying1);
-        }
-        if (sclick == 2)
-        {
-            fmlol::system->createSound(click.c_str(), FMOD_DEFAULT, nullptr, &sound2);
-            fmlol::result = fmlol::system->playSound(sound2, nullptr, false, &channel2);
-            channel2->setVolume(setv);
-            bool isPlaying1 = false;
-            do {
-                fmlol::system->update();
-            } while (isPlaying1);
-        }
-        if (srelease > 2) 
-        {
-            fmlol::system->createSound(sre.c_str(), FMOD_DEFAULT, nullptr, &sound3);
-            fmlol::result = fmlol::system->playSound(sound3, nullptr, false, &channel3);
-            channel3->setVolume(setv);
-            bool isPlaying1 = false;
-            do {
-                fmlol::system->update();
-            } while (isPlaying1);
-
-        }
-        
-        i3 += 0.2;
-        if (i3 > 1)
-        {
         }
         if (console == true)
         {
@@ -1916,10 +2049,10 @@ float PlayLayer2::prevX = 0;
 
 
 std::string getAccuracyText() {
-    if (PlayLayer2::frames == 0) return "Died: 0";
-    int p = (int)(PlayLayer2::deaths);
+    if (PlayLayer2::frames == 0) return "Died: ";
+    float p = (float)(PlayLayer2::frames - PlayLayer2::deaths) / (float)(PlayLayer2::frames);
     std::stringstream stream;
-    stream << "Died: " << std::fixed << std::setprecision(3) << p * 1 << "";
+    stream << "Died: " << std::fixed << std::setprecision(2) << p * 1 << "";
     return stream.str();
 }
 
@@ -1930,11 +2063,11 @@ bool __fastcall PlayLayer2::initHook(CCLayer* self, int edx, void* GJGameLevel) 
 
         prevX = 0;
 
-        if (base + 0x3222d0) {
-            CCLabelBMFont* textObj = CCLabelBMFont::create("Died: 0", "bigFont.fnt");
+
+            CCLabelBMFont* textObj = CCLabelBMFont::create("Died: ", "goldFont.fnt");
 
             textObj->setZOrder(1000);
-            textObj->setTag(1000000);
+            textObj->setTag(100000);
 
             textObj->setScale(0.5);
             auto size = textObj->getScaledContentSize();
@@ -1944,11 +2077,10 @@ bool __fastcall PlayLayer2::initHook(CCLayer* self, int edx, void* GJGameLevel) 
             self->addChild(textObj);
 
 
-        }
-        else {
 
+        
 
-        }
+        
     }
     return init(self, GJGameLevel);
 }
@@ -1956,7 +2088,6 @@ bool __fastcall PlayLayer2::initHook(CCLayer* self, int edx, void* GJGameLevel) 
 void __fastcall PlayLayer2::hkUpdate(cocos2d::CCLayer* self, void* edx, float delta) {
     if (why == true)
     {
-
         void* player1 = *(void**)((char*)self + 0x224);
         float x = *(float*)((size_t)player1 + 0x67c);
 
@@ -1964,25 +2095,21 @@ void __fastcall PlayLayer2::hkUpdate(cocos2d::CCLayer* self, void* edx, float de
             frames += 1;
             totalDelta += delta;
         }
-        if (wouldDie)
-        {
-            deaths += 1;
-        }
+
         size_t base = (size_t)GetModuleHandle(0);
 
-        {
-            CCLabelBMFont* textObj = (CCLabelBMFont*)self->getChildByTag(1000000);
+
+            CCLabelBMFont* textObj = (CCLabelBMFont*)self->getChildByTag(100000);
             auto text = getAccuracyText();
             textObj->setString(text.c_str());
             auto size = textObj->getScaledContentSize();
 
             textObj->setPosition({ size.width / 2 + 3, size.height / 2 + 3 });
-        }
 
 
         if (wouldDie) {
             wouldDie = false;
-
+            deaths += 1;
         }
 
         prevX = x;
@@ -2005,9 +2132,9 @@ int __fastcall PlayLayer2::hkResetLevel(void* self) {
 int __fastcall PlayLayer2::hkDeath(void* self, void*, void* go, void* powerrangers) {
     size_t base = (size_t)GetModuleHandle(0);
 
-    if (base + 0x3222d0) {
+
         wouldDie = true;
-    }
+    
 
     return death(self, go, powerrangers);
 }
