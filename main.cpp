@@ -2334,15 +2334,6 @@ unsigned int __fastcall resetLevelHook(void* self, int* edx) {
     return resetLevel(self);
 }
 
-#include "PlayLayer2.h"
-#include "GameManager2.h"
-#include <iomanip>
-
-bool PlayLayer2::wouldDie = false;
-int PlayLayer2::frames = 0;
-int PlayLayer2::deaths = 0;
-float PlayLayer2::totalDelta = 0;
-float PlayLayer2::prevX = 0;
 
 
 
